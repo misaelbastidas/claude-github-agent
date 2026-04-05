@@ -65,6 +65,11 @@ export default function Calculator() {
     setWaitingForOperand(false)
   }, [])
 
+  const handleBackspace = useCallback(() => {
+    if (waitingForOperand) return
+    setDisplay(prev => prev.length > 1 ? prev.slice(0, -1) : '0')
+  }, [waitingForOperand])
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key >= '0' && e.key <= '9') {
@@ -78,12 +83,15 @@ export default function Calculator() {
         handleEquals()
       } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
         handleClear()
+      } else if (e.key === 'Backspace') {
+        e.preventDefault()
+        handleBackspace()
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleNumber, handleDecimal, handleOperator, handleEquals, handleClear])
+  }, [handleNumber, handleDecimal, handleOperator, handleEquals, handleClear, handleBackspace])
 
   const buttons = [
     { label: 'C', type: 'clear', action: handleClear },
