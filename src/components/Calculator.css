@@ -66,21 +66,21 @@
 }
 
 .btn-number {
-  background: #505050;
+  background: #3a3a3c;
   color: #fff;
 }
 
 .btn-operator {
-  background: #0aff2b;
+  background: #ff9500;
   color: #fff;
 }
 
 .btn-clear {
   background: #a5a5a5;
-  color: #000;
+  color: #1c1c1e;
 }
 
 .btn-equals {
-  background: #30d158;
+  background: #e07800;
   color: #fff;
 }
