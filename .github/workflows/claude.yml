@@ -21,6 +21,11 @@ jobs:
     if: ${{ !contains(github.actor, '[bot]') && !contains(github.actor, 'netlify') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Claude Code Action
         uses: anthropics/claude-code-action@v1
         with:
