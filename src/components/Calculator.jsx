@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import './Calculator.css'
 
 export default function Calculator() {
@@ -7,27 +7,36 @@ export default function Calculator() {
   const [operator, setOperator] = useState(null)
   const [waitingForOperand, setWaitingForOperand] = useState(false)
 
-  const handleNumber = (num) => {
-    if (waitingForOperand) {
-      setDisplay(String(num))
-      setWaitingForOperand(false)
-    } else {
-      setDisplay(display === '0' ? String(num) : display + num)
-    }
-  }
+  const handleNumber = useCallback((num) => {
+    setDisplay(prev => {
+      if (waitingForOperand) {
+        setWaitingForOperand(false)
+        return String(num)
+      }
+      return prev === '0' ? String(num) : prev + num
+    })
+  }, [waitingForOperand])
 
-  const handleDecimal = () => {
+  const handleDecimal = useCallback(() => {
     if (waitingForOperand) {
       setDisplay('0.')
       setWaitingForOperand(false)
       return
     }
-    if (!display.includes('.')) {
-      setDisplay(display + '.')
-    }
-  }
+    setDisplay(prev => prev.includes('.') ? prev : prev + '.')
+  }, [waitingForOperand])
 
-  const handleOperator = (op) => {
+  const calculate = useCallback((a, b, op) => {
+    switch (op) {
+      case '+': return a + b
+      case '-': return a - b
+      case '*': return a * b
+      case '/': return b === 0 ? 'Error' : a / b
+      default: return b
+    }
+  }, [])
+
+  const handleOperator = useCallback((op) => {
     const current = parseFloat(display)
     if (prevValue !== null && !waitingForOperand) {
       const result = calculate(prevValue, current, operator)
@@ -38,19 +47,9 @@ export default function Calculator() {
     }
     setOperator(op)
     setWaitingForOperand(true)
-  }
+  }, [display, prevValue, operator, waitingForOperand, calculate])
 
-  const calculate = (a, b, op) => {
-    switch (op) {
-      case '+': return a + b
-      case '-': return a - b
-      case '*': return a * b
-      case '/': return b === 0 ? 'Error' : a / b
-      default: return b
-    }
-  }
-
-  const handleEquals = () => {
+  const handleEquals = useCallback(() => {
     if (operator === null || prevValue === null) return
     const current = parseFloat(display)
     const result = calculate(prevValue, current, operator)
@@ -58,14 +57,34 @@ export default function Calculator() {
     setPrevValue(null)
     setOperator(null)
     setWaitingForOperand(false)
-  }
+  }, [display, prevValue, operator, calculate])
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setDisplay('0')
     setPrevValue(null)
     setOperator(null)
     setWaitingForOperand(false)
-  }
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key >= '0' && e.key <= '9') {
+        handleNumber(e.key)
+      } else if (e.key === '.') {
+        handleDecimal()
+      } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+        handleOperator(e.key)
+      } else if (e.key === 'Enter' || e.key === '=') {
+        e.preventDefault()
+        handleEquals()
+      } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+        handleClear()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleNumber, handleDecimal, handleOperator, handleEquals, handleClear])
 
   const buttons = [
     { label: 'C', type: 'clear', action: handleClear },
