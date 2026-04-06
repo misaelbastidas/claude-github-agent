@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   claude-response:
-    if: ${{ !contains(github.actor, '[bot]') && !contains(github.actor, 'netlify') }}
+    if: ${{ github.actor == 'misaelbastidas' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
