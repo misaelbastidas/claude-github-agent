@@ -2,6 +2,8 @@
 
 Calculadora web construida con React + Vite. Proyecto base para demostrar la integración de GitHub con Claude Code.
 
+**Demo en producción:** <https://claude-github-agent.netlify.app/>
+
 ## Instalación y uso
 
 ```bash
